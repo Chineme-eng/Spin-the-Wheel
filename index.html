@@ -3,34 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stream Wheel</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;900&display=swap" rel="stylesheet">
+<title>Stream Wheel Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
 
 <style>
   :root {
-    --bg: #f4f4f5;
+    --bg: #f8f9fa;
     --surface: #ffffff;
-    --border: #e4e4e7;
-    --text: #18181b;
-    --text-muted: #71717a;
-    --primary: #3b82f6;
-    --primary-hover: #2563eb;
+    --border: #e9ecef;
+    --text: #212529;
+    --text-muted: #6c757d;
+    --primary: #f43f5e;
+    --primary-hover: #e11d48;
+    --shadow: 0 10px 40px rgba(0,0,0,0.08);
   }
 
   [data-theme="dark"] {
-    --bg: #09090b;
-    --surface: #18181b;
-    --border: #27272a;
-    --text: #f4f4f5;
-    --text-muted: #a1a1aa;
-    --primary: #3b82f6;
-    --primary-hover: #4f46e5;
+    --bg: #0f1115;
+    --surface: #181a20;
+    --border: #2b2f36;
+    --text: #f8f9fa;
+    --text-muted: #8b949e;
+    --primary: #f43f5e;
+    --primary-hover: #e11d48;
+    --shadow: 0 10px 40px rgba(0,0,0,0.4);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     background: var(--bg);
     color: var(--text);
     height: 100vh;
@@ -39,16 +41,17 @@
     transition: background 0.3s, color 0.3s;
   }
 
-  /* --- SIDEBAR CONTROLS (THE STEALTH PANEL) --- */
+  /* --- SIDEBAR CONTROLS --- */
   .sidebar {
-    width: 380px;
+    width: 360px;
     background: var(--surface);
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     padding: 24px;
-    z-index: 10;
+    z-index: 20;
     transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 2px 0 20px rgba(0,0,0,0.1);
   }
 
   .sidebar.hidden {
@@ -61,49 +64,44 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
   }
 
-  h1 { font-size: 24px; font-weight: 900; letter-spacing: -0.5px; }
+  h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
   
   .controls-top { display: flex; gap: 8px; }
 
-  button {
-    font-family: inherit;
-    cursor: pointer;
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    transition: all 0.2s;
-  }
-
   .icon-btn {
     width: 36px; height: 36px;
-    background: var(--bg);
+    background: var(--surface);
     color: var(--text);
     border: 1px solid var(--border);
+    border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
   }
   .icon-btn:hover { background: var(--border); }
 
   .input-group { display: flex; flex-direction: column; flex: 1; }
   
-  label { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;}
+  label { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;}
   
   textarea {
     flex: 1;
     resize: none;
     padding: 16px;
-    border-radius: 8px;
+    border-radius: 12px;
     border: 1px solid var(--border);
     background: var(--bg);
     color: var(--text);
     font-family: inherit;
-    font-size: 16px;
-    line-height: 1.5;
+    font-size: 15px;
+    line-height: 1.6;
     outline: none;
     margin-bottom: 16px;
+    transition: border-color 0.2s;
   }
   textarea:focus { border-color: var(--primary); }
 
@@ -111,8 +109,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 20px;
-    font-size: 14px;
+    margin-bottom: 10px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--text-muted);
     cursor: pointer;
@@ -120,53 +118,49 @@
   
   input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); }
 
-  .spin-btn {
-    background: var(--primary);
-    color: white;
-    padding: 18px;
-    font-size: 20px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
-  }
-  .spin-btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
-  .spin-btn:active { transform: translateY(0); }
-  .spin-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-
-  /* --- MAIN STAGE (THE WHEEL) --- */
+  /* --- MAIN STAGE --- */
   .stage {
     flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
   }
 
-  .show-sidebar-btn {
+  /* Minimal Gear Icon */
+  .gear-btn {
     position: absolute;
     top: 24px;
     left: 24px;
-    padding: 10px 16px;
+    width: 44px; height: 44px;
+    font-size: 20px;
     background: var(--surface);
-    color: var(--text);
+    border-radius: 12px;
     border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 14px;
+    color: var(--text-muted);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    z-index: 10;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s;
-    z-index: 5;
+    transition: all 0.3s;
   }
-  .sidebar.hidden ~ .stage .show-sidebar-btn {
+  .sidebar.hidden ~ .stage .gear-btn {
     opacity: 1;
     pointer-events: auto;
   }
+  .gear-btn:hover {
+    color: var(--text);
+    border-color: var(--text-muted);
+    transform: rotate(15deg);
+  }
 
-  .wheel-container {
+  .wheel-wrapper {
     position: relative;
-    width: 700px;
-    height: 700px;
-    filter: drop-shadow(0 10px 40px rgba(0,0,0,0.2));
+    width: 650px;
+    height: 650px;
+    margin-bottom: 40px;
+    filter: drop-shadow(var(--shadow));
   }
 
   canvas {
@@ -175,91 +169,97 @@
     border-radius: 50%;
   }
 
-  /* The Red Flipper / Pointer */
+  /* Floating Spin Button under the wheel */
+  .spin-action-btn {
+    background: var(--primary);
+    color: white;
+    padding: 16px 48px;
+    font-size: 22px;
+    font-family: inherit;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(244, 63, 94, 0.3);
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: 10;
+  }
+  .spin-action-btn:hover { background: var(--primary-hover); transform: translateY(-3px); box-shadow: 0 12px 28px rgba(244, 63, 94, 0.4); }
+  .spin-action-btn:active { transform: translateY(0); }
+  .spin-action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* Red Flipper */
   .pointer {
     position: absolute;
     top: -20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 50px;
-    height: 60px;
-    z-index: 2;
+    width: 45px;
+    height: 55px;
+    z-index: 5;
   }
   
   .pointer svg {
     width: 100%;
     height: 100%;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
     transform-origin: top center;
-    transition: transform 0.1s;
+    transition: transform 0.08s ease-out;
   }
-  
-  .pointer.ticking svg {
-    transform: rotate(25deg);
-  }
+  .pointer.ticking svg { transform: rotate(28deg); }
 
   /* Center Hub */
   .hub {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 60px; height: 60px;
+    width: 50px; height: 50px;
     background: var(--surface);
-    border: 6px solid var(--border);
+    border: 5px solid var(--bg);
     border-radius: 50%;
     z-index: 2;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.3);
   }
 
-  /* Confetti Canvas */
-  #confetti {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 100;
-  }
+  #confetti { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
 
   /* Winner Popup */
   .winner-popup {
     position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
     background: var(--surface);
     color: var(--text);
-    padding: 20px 40px;
-    border-radius: 12px;
-    border: 2px solid var(--primary);
-    font-size: 32px;
-    font-weight: 900;
+    padding: 24px 48px;
+    border-radius: 16px;
+    border: 3px solid var(--primary);
+    font-size: 36px;
+    font-weight: 800;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
     opacity: 0;
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 101;
     pointer-events: none;
   }
-  .winner-popup.show {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-  }
+  .winner-popup.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 </style>
 </head>
 <body>
 
-<div class="sidebar" id="sidebar">
+<div class="sidebar hidden" id="sidebar">
   <div class="header">
-    <h1>Spin<span style="color: var(--primary)">It</span></h1>
+    <h1>Setup <span style="color: var(--primary)">Wheel</span></h1>
     <div class="controls-top">
       <button class="icon-btn" id="themeBtn" title="Toggle Theme">☀️</button>
-      <button class="icon-btn" id="hideSidebarBtn" title="Hide Setup for Stream">👁️</button>
+      <button class="icon-btn" id="closeSidebarBtn" title="Close Setup">✕</button>
     </div>
   </div>
 
   <div class="input-group">
-    <label>Wheel Entries (One per line)</label>
+    <label>Entries (One per line)</label>
     <textarea id="itemsInput" spellcheck="false">Playing Random Duos
 Worst Weapon Challenge
 Q&A from Chat
@@ -272,45 +272,50 @@ Reviewing Subs Videos</textarea>
 
   <label class="settings">
     <input type="checkbox" id="eliminateCb">
-    Remove winner after spinning
+    Remove winner after spin
   </label>
-
-  <button class="spin-btn" id="spinBtn">Spin Wheel</button>
 </div>
 
 <div class="stage">
-  <button class="show-sidebar-btn" id="showSidebarBtn">⚙️ Show Setup</button>
+  <button class="icon-btn gear-btn" id="showSidebarBtn" title="Open Setup">⚙️</button>
   
-  <div class="wheel-container">
+  <div class="wheel-wrapper">
     <div class="pointer" id="pointer">
       <svg viewBox="0 0 50 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M25 60L5 15C1 7 7 0 15 0H35C43 0 49 7 45 15L25 60Z" fill="#ef4444"/>
-        <path d="M25 50L11 15C9 10 12 5 18 5H32C38 5 41 10 39 15L25 50Z" fill="#dc2626"/>
+        <path d="M25 60L5 15C1 7 7 0 15 0H35C43 0 49 7 45 15L25 60Z" fill="#e11d48"/>
+        <path d="M25 50L11 15C9 10 12 5 18 5H32C38 5 41 10 39 15L25 50Z" fill="#f43f5e"/>
       </svg>
     </div>
     <canvas id="wheel"></canvas>
     <div class="hub"></div>
   </div>
 
+  <button class="spin-action-btn" id="spinBtn">SPIN</button>
+
   <div class="winner-popup" id="winnerPopup">WINNER!</div>
   <canvas id="confetti"></canvas>
 </div>
 
 <script>
-// --- VIBRANT YOUTUBE-FRIENDLY COLOR PALETTE ---
+// Deep, rich colors for high contrast
 const colors = [
-  "#ef4444", "#f97316", "#eab308", "#22c55e", 
+  "#ef4444", "#f97316", "#eab308", "#10b981", 
   "#06b6d4", "#3b82f6", "#8b5cf6", "#ec4899"
 ];
 
 // --- APP STATE ---
 let items = [];
+let weights = [];
+let boundaries = []; 
 let isSpinning = false;
-let currentRotation = 0; // in radians
-let angularVelocity = 0;
+let currentRotation = 0; 
 let lastTickSlice = -1;
 
-// --- DOM ELEMENTS ---
+// Dragging state
+let hoveredPeg = -1;
+let isDraggingPeg = false;
+
+// --- DOM ---
 const canvas = document.getElementById('wheel');
 const ctx = canvas.getContext('2d');
 const itemsInput = document.getElementById('itemsInput');
@@ -320,7 +325,7 @@ const eliminateCb = document.getElementById('eliminateCb');
 const winnerPopup = document.getElementById('winnerPopup');
 const sidebar = document.getElementById('sidebar');
 
-// --- WEB AUDIO API (NO EXTERNAL FILES) ---
+// --- AUDIO ENGINE ---
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
 
@@ -334,282 +339,300 @@ function playTick() {
   osc.connect(gainNode);
   gainNode.connect(audioCtx.destination);
   
-  // Create a sharp, mechanical "clack" sound
-  osc.type = 'triangle';
-  osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.05);
   
-  gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+  gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
   gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
   
   osc.start(audioCtx.currentTime);
   osc.stop(audioCtx.currentTime + 0.05);
 
-  // Visually flick the pointer
   pointer.classList.add('ticking');
-  setTimeout(() => pointer.classList.remove('ticking'), 50);
+  setTimeout(() => pointer.classList.remove('ticking'), 40);
 }
 
-// --- SETUP CANVAS FOR HIGH-RES SCREENS ---
+// --- SETUP CANVAS ---
 function resizeCanvas() {
-  const size = 700;
+  const size = 650;
   const dpr = window.devicePixelRatio || 1;
   canvas.width = size * dpr;
   canvas.height = size * dpr;
+  canvas.style.width = size + 'px';
+  canvas.style.height = size + 'px';
   ctx.scale(dpr, dpr);
   drawWheel();
 }
 window.addEventListener('resize', resizeCanvas);
 
-// --- UPDATE ITEMS LIST ---
+// --- MATH & LOGIC ---
+function calculateBoundaries() {
+  let totalWeight = weights.reduce((a, b) => a + b, 0);
+  let acc = 0;
+  boundaries = [];
+  for(let i=0; i<items.length; i++) {
+    acc += (weights[i] / totalWeight) * Math.PI * 2;
+    boundaries.push(acc);
+  }
+}
+
 function updateItems() {
   items = itemsInput.value.split('\n').map(i => i.trim()).filter(i => i !== '');
   if (items.length === 0) items = ["Add options"];
+  
+  // Reset weights to equal sizes whenever list changes
+  weights = items.map(() => 1);
+  calculateBoundaries();
+  
   localStorage.setItem('wheelItems', itemsInput.value);
   drawWheel();
 }
 
-itemsInput.addEventListener('input', () => {
-  if (!isSpinning) updateItems();
-});
-
-// Load from memory
-if (localStorage.getItem('wheelItems')) {
-  itemsInput.value = localStorage.getItem('wheelItems');
-}
+itemsInput.addEventListener('input', () => { if (!isSpinning) updateItems(); });
+if (localStorage.getItem('wheelItems')) itemsInput.value = localStorage.getItem('wheelItems');
 updateItems();
 resizeCanvas();
 
-// --- DRAWING THE WHEEL ---
+// --- DRAW WHEEL ---
 function drawWheel() {
-  const cx = 350;
-  const cy = 350;
-  const radius = 350;
-  const sliceAngle = (2 * Math.PI) / items.length;
-
-  ctx.clearRect(0, 0, 700, 700);
+  const cx = 325, cy = 325, radius = 325;
+  ctx.clearRect(0, 0, 650, 650);
   
-  // We rotate the entire context to handle the spin
   ctx.save();
   ctx.translate(cx, cy);
   ctx.rotate(currentRotation);
 
+  let startAngle = 0;
   for (let i = 0; i < items.length; i++) {
-    const angle = i * sliceAngle;
+    let endAngle = boundaries[i];
     
     // Draw Slice
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    ctx.arc(0, 0, radius, angle, angle + sliceAngle);
+    ctx.arc(0, 0, radius, startAngle, endAngle);
     ctx.closePath();
     ctx.fillStyle = colors[i % colors.length];
     ctx.fill();
     
-    // Draw Divider Lines
-    ctx.lineWidth = 2;
+    // Divider
+    ctx.lineWidth = 3;
     ctx.strokeStyle = "rgba(0,0,0,0.15)";
     ctx.stroke();
 
-    // Draw Pegs (Dots on the edge)
-    const pegX = Math.cos(angle) * (radius - 12);
-    const pegY = Math.sin(angle) * (radius - 12);
-    ctx.beginPath();
-    ctx.arc(pegX, pegY, 4, 0, 2 * Math.PI);
-    ctx.fillStyle = "white";
-    ctx.fill();
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = "rgba(0,0,0,0.2)";
-    ctx.stroke();
+    // Draw Interactive Peg (Skip the very last one at 360deg to prevent wrap-around dragging issues)
+    if (i < items.length - 1) {
+      const pegX = Math.cos(endAngle) * (radius - 18);
+      const pegY = Math.sin(endAngle) * (radius - 18);
+      ctx.beginPath();
+      // Expand dot if hovered to indicate interactivity
+      ctx.arc(pegX, pegY, (hoveredPeg === i || isDraggingPeg && hoveredPeg === i) ? 10 : 5, 0, 2 * Math.PI);
+      ctx.fillStyle = "white";
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(0,0,0,0.3)";
+      ctx.stroke();
+    }
 
     // Draw Text
     ctx.save();
-    // Rotate to the center of the slice
-    ctx.rotate(angle + sliceAngle / 2);
+    let textAngle = startAngle + (endAngle - startAngle) / 2;
+    ctx.rotate(textAngle);
     ctx.textAlign = "right";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 24px 'DM Sans', sans-serif";
+    ctx.font = "bold 24px 'Plus Jakarta Sans', sans-serif";
     
-    // Shadow for readability
-    ctx.shadowColor = "rgba(0,0,0,0.5)";
-    ctx.shadowBlur = 4;
-    ctx.shadowOffsetX = 1;
-    ctx.shadowOffsetY = 1;
+    // Heavy drop shadow for ultimate visibility
+    ctx.shadowColor = "rgba(0,0,0,0.7)";
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
 
     let text = items[i];
-    // Shorten text if it's crazy long
-    if(text.length > 22) text = text.substring(0, 20) + "...";
-    ctx.fillText(text, radius - 30, 0);
+    if(text.length > 20) text = text.substring(0, 18) + "...";
+    ctx.fillText(text, radius - 40, 0);
     ctx.restore();
+
+    startAngle = endAngle;
   }
   ctx.restore();
 }
 
-// --- SPIN PHYSICS ---
-function easeOut(t, b, c, d) {
-  t /= d;
-  t--;
-  return c * (t * t * t + 1) + b;
-}
+// --- MOUSE INTERACTIONS (THE "RIGGING" FEATURE) ---
+canvas.addEventListener('mousemove', (e) => {
+  if (isSpinning) return;
+  
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left - rect.width / 2;
+  const y = e.clientY - rect.top - rect.height / 2;
+  const dist = Math.sqrt(x*x + y*y);
+  
+  let mouseAngle = Math.atan2(y, x);
+  let normMouse = (mouseAngle - currentRotation) % (Math.PI*2);
+  if (normMouse < 0) normMouse += Math.PI*2;
 
-let spinStart = 0;
-let spinDuration = 0;
-let targetRotation = 0;
-let startRotation = 0;
+  if (isDraggingPeg && hoveredPeg !== -1 && hoveredPeg < items.length - 1) {
+    canvas.style.cursor = 'grabbing';
+    let prevB = hoveredPeg === 0 ? 0 : boundaries[hoveredPeg - 1];
+    let nextB = boundaries[hoveredPeg + 1];
+    let minRad = 0.08; // Enforce a minimum slice size so it doesn't break
+    
+    if (normMouse > prevB + minRad && normMouse < nextB - minRad) {
+      let oldWeightSum = weights[hoveredPeg] + weights[hoveredPeg + 1];
+      let newRatio = (normMouse - prevB) / (nextB - prevB);
+      weights[hoveredPeg] = oldWeightSum * newRatio;
+      weights[hoveredPeg + 1] = oldWeightSum * (1 - newRatio);
+      calculateBoundaries();
+      drawWheel();
+    }
+  } else {
+    // Detect Hover
+    let found = -1;
+    if (Math.abs(dist - (rect.width/2 - 18)) < 30) {
+      for(let i=0; i<items.length - 1; i++) {
+        let diff = Math.abs(normMouse - boundaries[i]);
+        if (diff > Math.PI) diff = Math.PI*2 - diff; 
+        if (diff < 0.1) { found = i; break; }
+      }
+    }
+    
+    if (found !== hoveredPeg) {
+      hoveredPeg = found;
+      canvas.style.cursor = hoveredPeg !== -1 ? 'grab' : 'default';
+      drawWheel();
+    }
+  }
+});
+
+canvas.addEventListener('mousedown', () => { if (hoveredPeg !== -1) isDraggingPeg = true; });
+window.addEventListener('mouseup', () => { isDraggingPeg = false; canvas.style.cursor = hoveredPeg !== -1 ? 'grab' : 'default'; });
+
+// --- SPIN PHYSICS ---
+function easeOut(t, b, c, d) { t /= d; t--; return c * (t * t * t + 1) + b; }
+
+let spinStart = 0, spinDuration = 0, targetRotation = 0, startRotation = 0;
 
 function animateSpin(timestamp) {
   if (!spinStart) spinStart = timestamp;
   const elapsed = timestamp - spinStart;
 
   if (elapsed < spinDuration) {
-    const prevRotation = currentRotation;
     currentRotation = easeOut(elapsed, startRotation, targetRotation - startRotation, spinDuration);
     
-    // Calculate if we passed a peg to play the tick sound
-    // The pointer is at top (-90 degrees / -PI/2)
-    const sliceAngle = (2 * Math.PI) / items.length;
-    // Offset by PI/2 because wheel starts at 3 o'clock, pointer is at 12 o'clock
-    const normalizedRot = (currentRotation + Math.PI / 2) % (2 * Math.PI); 
-    const currentSlice = Math.floor((2 * Math.PI - normalizedRot) / sliceAngle) % items.length;
+    // Accurate tick detection based on custom slice sizes
+    let normalizedRot = (Math.PI*2 - (currentRotation % (Math.PI*2))) % (Math.PI*2);
+    let pointerAngle = (normalizedRot - Math.PI/2 + Math.PI*2) % (Math.PI*2);
+    
+    let currentSlice = 0;
+    for(let i=0; i<boundaries.length; i++) {
+        if (pointerAngle < boundaries[i]) { currentSlice = i; break; }
+    }
 
     if (currentSlice !== lastTickSlice) {
-      if (lastTickSlice !== -1) playTick(); // Don't tick on exact start
+      if (lastTickSlice !== -1) playTick(); 
       lastTickSlice = currentSlice;
     }
 
     drawWheel();
     requestAnimationFrame(animateSpin);
   } else {
-    // Finished Spinning
+    // Finished
     currentRotation = targetRotation % (2 * Math.PI);
     drawWheel();
     isSpinning = false;
     spinBtn.disabled = false;
-    spinBtn.innerText = "SPIN WHEEL";
+    spinBtn.innerText = "SPIN";
     
-    // Calculate Winner
-    const sliceAngle = (2 * Math.PI) / items.length;
-    const normalizedRot = (currentRotation + Math.PI / 2) % (2 * Math.PI);
-    // Because wheel spins clockwise, the index goes backwards
-    const winningIndex = Math.floor((2 * Math.PI - normalizedRot) / sliceAngle) % items.length;
-    const winner = items[winningIndex];
+    let normalizedRot = (Math.PI*2 - (currentRotation % (Math.PI*2))) % (Math.PI*2);
+    let pointerAngle = (normalizedRot - Math.PI/2 + Math.PI*2) % (Math.PI*2);
+    let winningIndex = 0;
+    for(let i=0; i<boundaries.length; i++) {
+        if (pointerAngle < boundaries[i]) { winningIndex = i; break; }
+    }
 
-    // Show Popup & Confetti
-    winnerPopup.innerText = winner;
+    winnerPopup.innerText = items[winningIndex];
     winnerPopup.classList.add('show');
     fireConfetti();
 
-    // Auto-remove feature
     if (eliminateCb.checked && items.length > 1) {
       setTimeout(() => {
         items.splice(winningIndex, 1);
         itemsInput.value = items.join('\n');
-        localStorage.setItem('wheelItems', itemsInput.value);
         updateItems();
-      }, 3000); // Wait 3 seconds before removing
+      }, 3500); 
     }
   }
 }
 
 spinBtn.addEventListener('click', () => {
   if (isSpinning || items.length <= 1) return;
-  
   isSpinning = true;
   spinBtn.disabled = true;
-  spinBtn.innerText = "SPINNING...";
+  spinBtn.innerText = "SPINNING";
   winnerPopup.classList.remove('show');
   
-  // Initialize Audio Context on first user interaction
   if (!audioCtx) audioCtx = new AudioContext();
-
-  // Give it a random duration (5-7 seconds) and lots of random rotations
-  spinDuration = 5000 + Math.random() * 2000; 
+  spinDuration = 4000 + Math.random() * 2000; 
   startRotation = currentRotation;
-  const spins = 10 + Math.random() * 10; 
-  targetRotation = currentRotation + (spins * 2 * Math.PI);
-  
+  targetRotation = currentRotation + ((8 + Math.random() * 5) * 2 * Math.PI);
   spinStart = null;
   lastTickSlice = -1;
   requestAnimationFrame(animateSpin);
 });
 
-// --- CONFETTI SYSTEM (Built-in) ---
+// --- CONFETTI SYSTEM ---
 const cCanvas = document.getElementById('confetti');
 const cCtx = cCanvas.getContext('2d');
-let particles = [];
-let confettiActive = false;
+let particles = [], confettiActive = false;
 
 function fireConfetti() {
   cCanvas.width = window.innerWidth;
   cCanvas.height = window.innerHeight;
   particles = [];
-  
-  for(let i=0; i<100; i++) {
+  for(let i=0; i<120; i++) {
     particles.push({
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2 + 100, // Starts near the bottom center of wheel
-      vx: (Math.random() - 0.5) * 20,
-      vy: (Math.random() - 1) * 20 - 5,
-      size: Math.random() * 10 + 5,
+      x: window.innerWidth / 2, y: window.innerHeight / 2 + 50,
+      vx: (Math.random() - 0.5) * 25, vy: (Math.random() - 1) * 25 - 5,
+      size: Math.random() * 12 + 6,
       color: colors[Math.floor(Math.random() * colors.length)],
-      rot: Math.random() * 360,
-      rotSpeed: (Math.random() - 0.5) * 10
+      rot: Math.random() * 360, rotSpeed: (Math.random() - 0.5) * 15
     });
   }
-  
-  if(!confettiActive) {
-    confettiActive = true;
-    animateConfetti();
-  }
+  if(!confettiActive) { confettiActive = true; animateConfetti(); }
 }
 
 function animateConfetti() {
   cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
   let active = false;
-  
   particles.forEach(p => {
     if(p.y < cCanvas.height) {
       active = true;
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.5; // gravity
-      p.rot += p.rotSpeed;
-      
+      p.x += p.vx; p.y += p.vy; p.vy += 0.6; p.rot += p.rotSpeed;
       cCtx.save();
-      cCtx.translate(p.x, p.y);
-      cCtx.rotate(p.rot * Math.PI / 180);
+      cCtx.translate(p.x, p.y); cCtx.rotate(p.rot * Math.PI / 180);
       cCtx.fillStyle = p.color;
       cCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
       cCtx.restore();
     }
   });
-  
-  if(active) requestAnimationFrame(animateConfetti);
-  else confettiActive = false;
+  if(active) requestAnimationFrame(animateConfetti); else confettiActive = false;
 }
 
-// --- UI CONTROLS ---
+// --- UI TOGGLES ---
 const themeBtn = document.getElementById('themeBtn');
 themeBtn.addEventListener('click', () => {
-  const root = document.documentElement;
-  const isDark = root.getAttribute('data-theme') === 'dark';
-  root.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
   themeBtn.innerText = isDark ? '🌙' : '☀️';
 });
 
-document.getElementById('hideSidebarBtn').addEventListener('click', () => {
-  sidebar.classList.add('hidden');
-});
+document.getElementById('closeSidebarBtn').addEventListener('click', () => sidebar.classList.add('hidden'));
+document.getElementById('showSidebarBtn').addEventListener('click', () => sidebar.classList.remove('hidden'));
 
-document.getElementById('showSidebarBtn').addEventListener('click', () => {
-  sidebar.classList.remove('hidden');
-});
-
-// Hide popup when clicking anywhere
 document.addEventListener('click', (e) => {
   if(e.target.id !== 'spinBtn') winnerPopup.classList.remove('show');
 });
-
 </script>
 </body>
 </html>
