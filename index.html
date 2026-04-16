@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stream Wheel Pro</title>
+<title>Stream Wheel Ultimate</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
 
 <style>
@@ -43,7 +43,7 @@
 
   /* --- SIDEBAR CONTROLS --- */
   .sidebar {
-    width: 360px;
+    width: 380px;
     background: var(--surface);
     border-right: 1px solid var(--border);
     display: flex;
@@ -52,7 +52,10 @@
     z-index: 20;
     transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
     box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+    overflow-y: auto;
   }
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
   .sidebar.hidden {
     transform: translateX(-100%);
@@ -84,39 +87,79 @@
   }
   .icon-btn:hover { background: var(--border); }
 
-  .input-group { display: flex; flex-direction: column; flex: 1; }
+  .section-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 20px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .input-group { display: flex; flex-direction: column; }
   
-  label { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;}
+  .row { display: flex; gap: 10px; margin-bottom: 12px; align-items: center; justify-content: space-between; }
+  
+  select, input[type="range"] {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .btn-small {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-small:hover { background: var(--border); }
   
   textarea {
-    flex: 1;
+    width: 100%;
     resize: none;
-    padding: 16px;
+    height: 140px;
+    padding: 14px;
     border-radius: 12px;
     border: 1px solid var(--border);
     background: var(--bg);
     color: var(--text);
     font-family: inherit;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.6;
     outline: none;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     transition: border-color 0.2s;
   }
   textarea:focus { border-color: var(--primary); }
 
-  .settings {
+  .settings-label {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 10px;
     font-size: 13px;
     font-weight: 700;
     color: var(--text-muted);
     cursor: pointer;
+    margin-bottom: 8px;
   }
   
-  input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); }
+  input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
+  input[type="range"] { padding: 0; height: 4px; border: none; }
 
   /* --- MAIN STAGE --- */
   .stage {
@@ -144,16 +187,10 @@
     opacity: 0;
     pointer-events: none;
     transition: all 0.3s;
+    cursor: pointer;
   }
-  .sidebar.hidden ~ .stage .gear-btn {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  .gear-btn:hover {
-    color: var(--text);
-    border-color: var(--text-muted);
-    transform: rotate(15deg);
-  }
+  .sidebar.hidden ~ .stage .gear-btn { opacity: 1; pointer-events: auto; }
+  .gear-btn:hover { color: var(--text); border-color: var(--text-muted); transform: rotate(20deg); }
 
   .wheel-wrapper {
     position: relative;
@@ -163,13 +200,8 @@
     filter: drop-shadow(var(--shadow));
   }
 
-  canvas {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-  }
+  canvas { width: 100%; height: 100%; border-radius: 50%; }
 
-  /* Floating Spin Button under the wheel */
   .spin-action-btn {
     background: var(--primary);
     color: white;
@@ -200,10 +232,8 @@
     height: 55px;
     z-index: 5;
   }
-  
   .pointer svg {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
     transform-origin: top center;
     transition: transform 0.08s ease-out;
@@ -253,31 +283,70 @@
   <div class="header">
     <h1>Setup <span style="color: var(--primary)">Wheel</span></h1>
     <div class="controls-top">
-      <button class="icon-btn" id="themeBtn" title="Toggle Theme">☀️</button>
+      <button class="icon-btn" id="themeBtn" title="Toggle App Theme">☀️</button>
       <button class="icon-btn" id="closeSidebarBtn" title="Close Setup">✕</button>
     </div>
   </div>
 
-  <div class="input-group">
-    <label>Entries (One per line)</label>
-    <textarea id="itemsInput" spellcheck="false">Playing Random Duos
-Worst Weapon Challenge
-Q&A from Chat
-Viewers Control My Game
-No Healing Allowed
-Drop Random Item
-Do 10 Pushups
-Reviewing Subs Videos</textarea>
+  <div class="section-title">Presets</div>
+  <div class="row">
+    <select id="presetSelect"></select>
+  </div>
+  <div class="row">
+    <button class="btn-small" style="flex:1;" id="savePresetBtn">Save Preset</button>
+    <button class="btn-small" style="color: var(--primary);" id="deletePresetBtn">Delete</button>
   </div>
 
-  <label class="settings">
-    <input type="checkbox" id="eliminateCb">
-    Remove winner after spin
-  </label>
+  <div class="section-title">Entries</div>
+  <textarea id="itemsInput" spellcheck="false"></textarea>
+  <div class="row">
+    <label class="settings-label" style="flex:1; margin:0;">
+      <input type="checkbox" id="eliminateCb"> Remove after spin
+    </label>
+    <button class="btn-small" id="equalizeBtn">Equalize Sizes</button>
+  </div>
+
+  <div class="section-title">Visuals</div>
+  <div class="row">
+    <span class="settings-label">Wheel Colors</span>
+    <select id="paletteSelect">
+      <option value="rainbow">Rainbow</option>
+      <option value="dark">Dark Mode</option>
+      <option value="light">Light/Pastel</option>
+      <option value="warm">Warm Tones</option>
+      <option value="cool">Cool Tones</option>
+    </select>
+  </div>
+  <div class="row">
+    <span class="settings-label">Font Color</span>
+    <select id="fontColorSelect">
+      <option value="#ffffff">White</option>
+      <option value="#111111">Black</option>
+      <option value="#fde047">Yellow</option>
+    </select>
+  </div>
+
+  <div class="section-title">Physics & Audio</div>
+  <div class="row">
+    <span class="settings-label" style="width: 80px;">Duration</span>
+    <input type="range" id="durationSlider" min="3" max="15" value="6">
+    <span class="settings-label" id="durationVal" style="width: 20px;">6s</span>
+  </div>
+  <div class="row">
+    <span class="settings-label" style="width: 80px;">Volume</span>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.5">
+  </div>
+  <div class="row">
+    <span class="settings-label">Sound Type</span>
+    <select id="soundTypeSelect">
+      <option value="mechanical">Mechanical Clack</option>
+      <option value="arcade">Arcade Blip</option>
+    </select>
+  </div>
 </div>
 
 <div class="stage">
-  <button class="icon-btn gear-btn" id="showSidebarBtn" title="Open Setup">⚙️</button>
+  <button class="gear-btn" id="showSidebarBtn" title="Open Setup">⚙️</button>
   
   <div class="wheel-wrapper">
     <div class="pointer" id="pointer">
@@ -297,11 +366,17 @@ Reviewing Subs Videos</textarea>
 </div>
 
 <script>
-// Deep, rich colors for high contrast
-const colors = [
-  "#ef4444", "#f97316", "#eab308", "#10b981", 
-  "#06b6d4", "#3b82f6", "#8b5cf6", "#ec4899"
-];
+// --- CONFIGURATIONS ---
+const THEMES = {
+  rainbow: ["#ef4444", "#f97316", "#eab308", "#10b981", "#06b6d4", "#3b82f6", "#8b5cf6", "#ec4899"],
+  dark: ["#1e293b", "#334155", "#475569", "#0f172a"],
+  light: ["#fef08a", "#bbf7d0", "#bfdbfe", "#fbcfe8", "#e9d5ff"],
+  warm: ["#7f1d1d", "#991b1b", "#b91c1c", "#dc2626", "#ea580c", "#d97706"],
+  cool: ["#083344", "#0e7490", "#0369a1", "#1d4ed8", "#4338ca"]
+};
+
+const defaultList = "Playing Random Duos\nWorst Weapon Challenge\nQ&A from Chat\nViewers Control My Game\nDrop Random Item\nDo 10 Pushups";
+let savedPresets = JSON.parse(localStorage.getItem('wheelPresets')) || { "Default": defaultList };
 
 // --- APP STATE ---
 let items = [];
@@ -310,44 +385,93 @@ let boundaries = [];
 let isSpinning = false;
 let currentRotation = 0; 
 let lastTickSlice = -1;
+let hoveredLine = -1;
+let isDraggingLine = false;
 
-// Dragging state
-let hoveredPeg = -1;
-let isDraggingPeg = false;
+// Settings
+let currentColors = THEMES.rainbow;
+let fontColor = "#ffffff";
+let spinSeconds = 6;
+let tickVolume = 0.5;
+let soundType = "mechanical";
 
-// --- DOM ---
+// --- DOM ELEMENTS ---
 const canvas = document.getElementById('wheel');
 const ctx = canvas.getContext('2d');
 const itemsInput = document.getElementById('itemsInput');
 const spinBtn = document.getElementById('spinBtn');
 const pointer = document.getElementById('pointer');
-const eliminateCb = document.getElementById('eliminateCb');
-const winnerPopup = document.getElementById('winnerPopup');
 const sidebar = document.getElementById('sidebar');
+const presetSelect = document.getElementById('presetSelect');
+
+// --- PRESET LOGIC ---
+function loadPresets() {
+  presetSelect.innerHTML = '';
+  for (let key in savedPresets) {
+    let opt = document.createElement('option');
+    opt.value = key; opt.innerText = key;
+    presetSelect.appendChild(opt);
+  }
+}
+
+document.getElementById('savePresetBtn').onclick = () => {
+  const name = prompt("Enter a name for this preset:");
+  if (name) {
+    savedPresets[name] = itemsInput.value;
+    localStorage.setItem('wheelPresets', JSON.stringify(savedPresets));
+    loadPresets();
+    presetSelect.value = name;
+  }
+};
+
+document.getElementById('deletePresetBtn').onclick = () => {
+  const name = presetSelect.value;
+  if (name === "Default") return alert("Cannot delete Default preset.");
+  if (confirm(`Delete preset "${name}"?`)) {
+    delete savedPresets[name];
+    localStorage.setItem('wheelPresets', JSON.stringify(savedPresets));
+    loadPresets();
+    itemsInput.value = savedPresets["Default"];
+    updateItems();
+  }
+};
+
+presetSelect.onchange = () => {
+  itemsInput.value = savedPresets[presetSelect.value];
+  updateItems();
+};
 
 // --- AUDIO ENGINE ---
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
 
 function playTick() {
+  if (tickVolume === 0) return;
   if (!audioCtx) audioCtx = new AudioContext();
   if (audioCtx.state === 'suspended') audioCtx.resume();
   
   const osc = audioCtx.createOscillator();
   const gainNode = audioCtx.createGain();
-  
   osc.connect(gainNode);
   gainNode.connect(audioCtx.destination);
   
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.05);
+  const t = audioCtx.currentTime;
   
-  gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-  
-  osc.start(audioCtx.currentTime);
-  osc.stop(audioCtx.currentTime + 0.05);
+  if (soundType === 'mechanical') {
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(400, t);
+    osc.frequency.exponentialRampToValueAtTime(100, t + 0.04);
+    gainNode.gain.setValueAtTime(tickVolume, t);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+    osc.start(t); osc.stop(t + 0.04);
+  } else {
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(1200, t);
+    osc.frequency.setValueAtTime(1500, t + 0.02);
+    gainNode.gain.setValueAtTime(tickVolume * 0.4, t); // Arcade is naturally louder
+    gainNode.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+    osc.start(t); osc.stop(t + 0.04);
+  }
 
   pointer.classList.add('ticking');
   setTimeout(() => pointer.classList.remove('ticking'), 40);
@@ -380,19 +504,20 @@ function calculateBoundaries() {
 function updateItems() {
   items = itemsInput.value.split('\n').map(i => i.trim()).filter(i => i !== '');
   if (items.length === 0) items = ["Add options"];
-  
-  // Reset weights to equal sizes whenever list changes
   weights = items.map(() => 1);
   calculateBoundaries();
-  
-  localStorage.setItem('wheelItems', itemsInput.value);
+  savedPresets[presetSelect.value] = itemsInput.value;
+  localStorage.setItem('wheelPresets', JSON.stringify(savedPresets));
   drawWheel();
 }
 
+document.getElementById('equalizeBtn').onclick = () => {
+  weights = items.map(() => 1);
+  calculateBoundaries();
+  drawWheel();
+};
+
 itemsInput.addEventListener('input', () => { if (!isSpinning) updateItems(); });
-if (localStorage.getItem('wheelItems')) itemsInput.value = localStorage.getItem('wheelItems');
-updateItems();
-resizeCanvas();
 
 // --- DRAW WHEEL ---
 function drawWheel() {
@@ -407,44 +532,30 @@ function drawWheel() {
   for (let i = 0; i < items.length; i++) {
     let endAngle = boundaries[i];
     
-    // Draw Slice
+    // Slice
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.arc(0, 0, radius, startAngle, endAngle);
     ctx.closePath();
-    ctx.fillStyle = colors[i % colors.length];
+    ctx.fillStyle = currentColors[i % currentColors.length];
     ctx.fill();
     
-    // Divider
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "rgba(0,0,0,0.15)";
+    // Divider Lines (Act as drag handles)
+    ctx.lineWidth = (hoveredLine === i || (isDraggingLine && hoveredLine === i)) ? 6 : 3;
+    ctx.strokeStyle = (hoveredLine === i) ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.15)";
     ctx.stroke();
 
-    // Draw Interactive Peg (Skip the very last one at 360deg to prevent wrap-around dragging issues)
-    if (i < items.length - 1) {
-      const pegX = Math.cos(endAngle) * (radius - 18);
-      const pegY = Math.sin(endAngle) * (radius - 18);
-      ctx.beginPath();
-      // Expand dot if hovered to indicate interactivity
-      ctx.arc(pegX, pegY, (hoveredPeg === i || isDraggingPeg && hoveredPeg === i) ? 10 : 5, 0, 2 * Math.PI);
-      ctx.fillStyle = "white";
-      ctx.fill();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "rgba(0,0,0,0.3)";
-      ctx.stroke();
-    }
-
-    // Draw Text
+    // Text
     ctx.save();
     let textAngle = startAngle + (endAngle - startAngle) / 2;
     ctx.rotate(textAngle);
     ctx.textAlign = "right";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = fontColor;
     ctx.font = "bold 24px 'Plus Jakarta Sans', sans-serif";
     
-    // Heavy drop shadow for ultimate visibility
-    ctx.shadowColor = "rgba(0,0,0,0.7)";
+    // Shadow guarantees readability on any color background
+    ctx.shadowColor = fontColor === "#111111" ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.7)";
     ctx.shadowBlur = 6;
     ctx.shadowOffsetX = 2;
     ctx.shadowOffsetY = 2;
@@ -459,7 +570,7 @@ function drawWheel() {
   ctx.restore();
 }
 
-// --- MOUSE INTERACTIONS (THE "RIGGING" FEATURE) ---
+// --- MOUSE INTERACTIONS (DRAGGING LINES) ---
 canvas.addEventListener('mousemove', (e) => {
   if (isSpinning) return;
   
@@ -472,41 +583,40 @@ canvas.addEventListener('mousemove', (e) => {
   let normMouse = (mouseAngle - currentRotation) % (Math.PI*2);
   if (normMouse < 0) normMouse += Math.PI*2;
 
-  if (isDraggingPeg && hoveredPeg !== -1 && hoveredPeg < items.length - 1) {
+  if (isDraggingLine && hoveredLine !== -1 && hoveredLine < items.length - 1) {
     canvas.style.cursor = 'grabbing';
-    let prevB = hoveredPeg === 0 ? 0 : boundaries[hoveredPeg - 1];
-    let nextB = boundaries[hoveredPeg + 1];
-    let minRad = 0.08; // Enforce a minimum slice size so it doesn't break
+    let prevB = hoveredLine === 0 ? 0 : boundaries[hoveredLine - 1];
+    let nextB = boundaries[hoveredLine + 1];
+    let minRad = 0.08; 
     
     if (normMouse > prevB + minRad && normMouse < nextB - minRad) {
-      let oldWeightSum = weights[hoveredPeg] + weights[hoveredPeg + 1];
+      let oldWeightSum = weights[hoveredLine] + weights[hoveredLine + 1];
       let newRatio = (normMouse - prevB) / (nextB - prevB);
-      weights[hoveredPeg] = oldWeightSum * newRatio;
-      weights[hoveredPeg + 1] = oldWeightSum * (1 - newRatio);
+      weights[hoveredLine] = oldWeightSum * newRatio;
+      weights[hoveredLine + 1] = oldWeightSum * (1 - newRatio);
       calculateBoundaries();
       drawWheel();
     }
   } else {
-    // Detect Hover
     let found = -1;
-    if (Math.abs(dist - (rect.width/2 - 18)) < 30) {
+    if (dist < radius) {
       for(let i=0; i<items.length - 1; i++) {
         let diff = Math.abs(normMouse - boundaries[i]);
         if (diff > Math.PI) diff = Math.PI*2 - diff; 
-        if (diff < 0.1) { found = i; break; }
+        if (diff < 0.06) { found = i; break; } // Tolerance for grabbing line
       }
     }
     
-    if (found !== hoveredPeg) {
-      hoveredPeg = found;
-      canvas.style.cursor = hoveredPeg !== -1 ? 'grab' : 'default';
+    if (found !== hoveredLine) {
+      hoveredLine = found;
+      canvas.style.cursor = hoveredLine !== -1 ? 'grab' : 'default';
       drawWheel();
     }
   }
 });
 
-canvas.addEventListener('mousedown', () => { if (hoveredPeg !== -1) isDraggingPeg = true; });
-window.addEventListener('mouseup', () => { isDraggingPeg = false; canvas.style.cursor = hoveredPeg !== -1 ? 'grab' : 'default'; });
+canvas.addEventListener('mousedown', () => { if (hoveredLine !== -1) isDraggingLine = true; });
+window.addEventListener('mouseup', () => { isDraggingLine = false; canvas.style.cursor = hoveredLine !== -1 ? 'grab' : 'default'; });
 
 // --- SPIN PHYSICS ---
 function easeOut(t, b, c, d) { t /= d; t--; return c * (t * t * t + 1) + b; }
@@ -520,7 +630,6 @@ function animateSpin(timestamp) {
   if (elapsed < spinDuration) {
     currentRotation = easeOut(elapsed, startRotation, targetRotation - startRotation, spinDuration);
     
-    // Accurate tick detection based on custom slice sizes
     let normalizedRot = (Math.PI*2 - (currentRotation % (Math.PI*2))) % (Math.PI*2);
     let pointerAngle = (normalizedRot - Math.PI/2 + Math.PI*2) % (Math.PI*2);
     
@@ -537,7 +646,6 @@ function animateSpin(timestamp) {
     drawWheel();
     requestAnimationFrame(animateSpin);
   } else {
-    // Finished
     currentRotation = targetRotation % (2 * Math.PI);
     drawWheel();
     isSpinning = false;
@@ -551,15 +659,20 @@ function animateSpin(timestamp) {
         if (pointerAngle < boundaries[i]) { winningIndex = i; break; }
     }
 
+    const winnerPopup = document.getElementById('winnerPopup');
     winnerPopup.innerText = items[winningIndex];
     winnerPopup.classList.add('show');
     fireConfetti();
 
-    if (eliminateCb.checked && items.length > 1) {
+    if (document.getElementById('eliminateCb').checked && items.length > 1) {
       setTimeout(() => {
         items.splice(winningIndex, 1);
+        weights.splice(winningIndex, 1);
+        calculateBoundaries();
         itemsInput.value = items.join('\n');
-        updateItems();
+        savedPresets[presetSelect.value] = itemsInput.value;
+        localStorage.setItem('wheelPresets', JSON.stringify(savedPresets));
+        drawWheel();
       }, 3500); 
     }
   }
@@ -570,12 +683,14 @@ spinBtn.addEventListener('click', () => {
   isSpinning = true;
   spinBtn.disabled = true;
   spinBtn.innerText = "SPINNING";
-  winnerPopup.classList.remove('show');
+  document.getElementById('winnerPopup').classList.remove('show');
   
   if (!audioCtx) audioCtx = new AudioContext();
-  spinDuration = 4000 + Math.random() * 2000; 
+  
+  // Base duration + random extra, mapped to slider
+  spinDuration = (spinSeconds * 1000) + (Math.random() * 1000); 
   startRotation = currentRotation;
-  targetRotation = currentRotation + ((8 + Math.random() * 5) * 2 * Math.PI);
+  targetRotation = currentRotation + (((spinSeconds / 2) + Math.random() * 4) * 2 * Math.PI);
   spinStart = null;
   lastTickSlice = -1;
   requestAnimationFrame(animateSpin);
@@ -587,15 +702,14 @@ const cCtx = cCanvas.getContext('2d');
 let particles = [], confettiActive = false;
 
 function fireConfetti() {
-  cCanvas.width = window.innerWidth;
-  cCanvas.height = window.innerHeight;
+  cCanvas.width = window.innerWidth; cCanvas.height = window.innerHeight;
   particles = [];
   for(let i=0; i<120; i++) {
     particles.push({
       x: window.innerWidth / 2, y: window.innerHeight / 2 + 50,
       vx: (Math.random() - 0.5) * 25, vy: (Math.random() - 1) * 25 - 5,
       size: Math.random() * 12 + 6,
-      color: colors[Math.floor(Math.random() * colors.length)],
+      color: currentColors[Math.floor(Math.random() * currentColors.length)],
       rot: Math.random() * 360, rotSpeed: (Math.random() - 0.5) * 15
     });
   }
@@ -619,7 +733,30 @@ function animateConfetti() {
   if(active) requestAnimationFrame(animateConfetti); else confettiActive = false;
 }
 
-// --- UI TOGGLES ---
+// --- INITIALIZE UI LISTENERS ---
+document.getElementById('paletteSelect').addEventListener('change', (e) => {
+  currentColors = THEMES[e.target.value];
+  drawWheel();
+});
+
+document.getElementById('fontColorSelect').addEventListener('change', (e) => {
+  fontColor = e.target.value;
+  drawWheel();
+});
+
+document.getElementById('durationSlider').addEventListener('input', (e) => {
+  spinSeconds = parseInt(e.target.value);
+  document.getElementById('durationVal').innerText = spinSeconds + 's';
+});
+
+document.getElementById('volumeSlider').addEventListener('input', (e) => {
+  tickVolume = parseFloat(e.target.value);
+});
+
+document.getElementById('soundTypeSelect').addEventListener('change', (e) => {
+  soundType = e.target.value;
+});
+
 const themeBtn = document.getElementById('themeBtn');
 themeBtn.addEventListener('click', () => {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -629,10 +766,18 @@ themeBtn.addEventListener('click', () => {
 
 document.getElementById('closeSidebarBtn').addEventListener('click', () => sidebar.classList.add('hidden'));
 document.getElementById('showSidebarBtn').addEventListener('click', () => sidebar.classList.remove('hidden'));
-
 document.addEventListener('click', (e) => {
-  if(e.target.id !== 'spinBtn') winnerPopup.classList.remove('show');
+  if(e.target.id !== 'spinBtn' && !e.target.closest('.sidebar') && !e.target.closest('#showSidebarBtn')) {
+    document.getElementById('winnerPopup').classList.remove('show');
+  }
 });
+
+// Boot
+loadPresets();
+presetSelect.value = "Default";
+itemsInput.value = savedPresets["Default"];
+updateItems();
+resizeCanvas();
 </script>
 </body>
 </html>
