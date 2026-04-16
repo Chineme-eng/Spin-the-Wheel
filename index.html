@@ -171,7 +171,6 @@
     position: relative;
   }
 
-  /* Minimal Gear Icon */
   .gear-btn {
     position: absolute;
     top: 24px;
@@ -468,7 +467,7 @@ function playTick() {
     osc.type = 'square';
     osc.frequency.setValueAtTime(1200, t);
     osc.frequency.setValueAtTime(1500, t + 0.02);
-    gainNode.gain.setValueAtTime(tickVolume * 0.4, t); // Arcade is naturally louder
+    gainNode.gain.setValueAtTime(tickVolume * 0.4, t); 
     gainNode.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
     osc.start(t); osc.stop(t + 0.04);
   }
@@ -540,10 +539,26 @@ function drawWheel() {
     ctx.fillStyle = currentColors[i % currentColors.length];
     ctx.fill();
     
-    // Divider Lines (Act as drag handles)
-    ctx.lineWidth = (hoveredLine === i || (isDraggingLine && hoveredLine === i)) ? 6 : 3;
-    ctx.strokeStyle = (hoveredLine === i) ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.15)";
+    // Divider Lines
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "rgba(0,0,0,0.15)";
     ctx.stroke();
+
+    // The Drag Ball (Peg)
+    if (i < items.length - 1) { // Skip the final 360 wrap-around boundary
+      const pegRadius = (hoveredLine === i || (isDraggingLine && hoveredLine === i)) ? 12 : 7;
+      const pegX = Math.cos(endAngle) * (radius - 15);
+      const pegY = Math.sin(endAngle) * (radius - 15);
+      
+      ctx.beginPath();
+      ctx.arc(pegX, pegY, pegRadius, 0, 2 * Math.PI);
+      ctx.fillStyle = currentColors[i % currentColors.length]; // Match slice color
+      ctx.fill();
+      ctx.lineWidth = 3;
+      // Match stroke to text color for high contrast
+      ctx.strokeStyle = fontColor === "#111111" ? "#111111" : "#ffffff";
+      ctx.stroke();
+    }
 
     // Text
     ctx.save();
@@ -554,7 +569,7 @@ function drawWheel() {
     ctx.fillStyle = fontColor;
     ctx.font = "bold 24px 'Plus Jakarta Sans', sans-serif";
     
-    // Shadow guarantees readability on any color background
+    // Shadow guarantees readability
     ctx.shadowColor = fontColor === "#111111" ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.7)";
     ctx.shadowBlur = 6;
     ctx.shadowOffsetX = 2;
@@ -570,7 +585,7 @@ function drawWheel() {
   ctx.restore();
 }
 
-// --- MOUSE INTERACTIONS (DRAGGING LINES) ---
+// --- MOUSE INTERACTIONS (DRAGGING BALLS) ---
 canvas.addEventListener('mousemove', (e) => {
   if (isSpinning) return;
   
@@ -599,11 +614,12 @@ canvas.addEventListener('mousemove', (e) => {
     }
   } else {
     let found = -1;
-    if (dist < radius) {
+    // Check if mouse is hovering near the outer edge where the balls are
+    if (Math.abs(dist - (325 - 15)) < 30) {
       for(let i=0; i<items.length - 1; i++) {
         let diff = Math.abs(normMouse - boundaries[i]);
         if (diff > Math.PI) diff = Math.PI*2 - diff; 
-        if (diff < 0.06) { found = i; break; } // Tolerance for grabbing line
+        if (diff < 0.08) { found = i; break; }
       }
     }
     
